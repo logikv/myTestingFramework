@@ -1,6 +1,7 @@
 package myAnnotation;
 
 
+import myAnnotation.annotation.AfterSuite;
 import myAnnotation.annotation.BeforeSuite;
 import myAnnotation.annotation.Test;
 import myAnnotation.annotation.TestedClass;
@@ -11,8 +12,14 @@ public class TestStorage {
     private static int fileSize;
     private static int storageSize;
 
+    @AfterSuite
+    public static void destroy() {
+        fileSize = 0;
+        storageSize = 0;
+    }
+
     @BeforeSuite
-    public static void before(){
+    public static void init() {
         fileSize=5;
         storageSize=30;
     }

@@ -1,12 +1,15 @@
 package myAnnotation;
 
+import myAnnotation.annotation.AfterSuite;
 import myAnnotation.annotation.BeforeSuite;
 import myAnnotation.annotation.Test;
 import myAnnotation.annotation.TestedClass;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +20,7 @@ public class TestSomething {
     private static Class<? extends java.lang.annotation.Annotation> testClazz = Test.class;
     private static Method[] clazzMethods = clazz.getDeclaredMethods();
     private static Method beforeSuiteMethod;
+    private static Method afterSuiteMethod;
     private static TestStorage testStorageInstance;
 
     public static void main(String[] args) {
@@ -67,19 +71,44 @@ public class TestSomething {
         }
     }
 
-    private static void findBeforeSuite() {
-        beforeSuiteMethod = Arrays.stream(clazzMethods)
+    private static void findBeforeSuite() throws Exception {
+        ArrayList<Method> suits = new ArrayList<>();
+        Arrays.stream(clazzMethods)
                 .filter(method -> method.isAnnotationPresent(BeforeSuite.class))
-                .findAny()
-                .orElse(null);
+                .forEach(suits::add);
+        if (suits.size() > 1) {
+            throw new Exception("You have more then one BeforeSuite method");
+        } else {
+            beforeSuiteMethod = suits.get(0);
+        }
+    }
+
+    private static void findAfterSuite() throws Exception {
+        ArrayList<Method> suits = new ArrayList<>();
+        Arrays.stream(clazzMethods)
+                .filter(method -> method.isAnnotationPresent(AfterSuite.class))
+                .forEach(suits::add);
+        if (suits.size() > 1) {
+            throw new Exception("You have more then one AfterSuite method");
+        } else {
+            afterSuiteMethod = suits.get(0);
+        }
     }
 
     private static void runTestedMethod(Method method) {
+        System.out.println();
         System.out.print("Start test :: ");
         newClassInstance();
-        findBeforeSuite();
+        try {
+            findBeforeSuite();
+            findAfterSuite();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (beforeSuiteMethod != null) runMethod(beforeSuiteMethod);
         runMethod(method);
+        System.out.print("Complete test :: ");
+        if (afterSuiteMethod != null) runMethod(afterSuiteMethod);
     }
 
     private static void runMethod(Method method) {
