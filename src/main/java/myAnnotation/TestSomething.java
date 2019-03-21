@@ -25,12 +25,12 @@ public class TestSomething {
         }
     }
 
-    private static void startClassTesting(){
-        methodQueue().forEach(TestSomething::runTestedMethod);
+    private static void startClassTesting() {
+        methodsQueue().forEach(TestSomething::runTestedMethod);
     }
 
 
-    private static ArrayDeque<Method> methodQueue() {
+    private static ArrayDeque<Method> methodsQueue() {
         List<Method> methods = getTestedMethods();
         ArrayDeque<Method> queue = new ArrayDeque<>();
         for (int i = 1; i <= 10; i++) {
@@ -74,18 +74,18 @@ public class TestSomething {
                 .orElse(null);
     }
 
-    public static void runTestedMethod(Method method){
+    private static void runTestedMethod(Method method) {
         System.out.print("Start test :: ");
         newClassInstance();
         findBeforeSuite();
-        if (beforeSuiteMethod != null ) runMethod(beforeSuiteMethod);
+        if (beforeSuiteMethod != null) runMethod(beforeSuiteMethod);
         runMethod(method);
     }
 
     private static void runMethod(Method method) {
         try {
             method.invoke(testStorageInstance);
-            System.out.println(method.getName()+" invoked");
+            System.out.println(method.getName() + " invoked");
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
