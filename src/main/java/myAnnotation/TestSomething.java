@@ -30,7 +30,15 @@ public class TestSomething {
     }
 
     private static void startClassTesting() {
-        methodsQueue().forEach(TestSomething::runTestedMethod);
+        try {
+
+            for (Method method : methodsQueue()) {
+                runTestedMethod(method);
+            }
+        } catch (Exception e) {
+            System.out.println("Test interrupted :: " + e.toString());
+        }
+
     }
 
 
@@ -95,16 +103,14 @@ public class TestSomething {
         }
     }
 
-    private static void runTestedMethod(Method method) {
+    private static void runTestedMethod(Method method) throws Exception {
         System.out.println();
         System.out.print("Start test :: ");
         newClassInstance();
-        try {
-            findBeforeSuite();
-            findAfterSuite();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        findBeforeSuite();
+        findAfterSuite();
+
         if (beforeSuiteMethod != null) runMethod(beforeSuiteMethod);
         runMethod(method);
         System.out.print("Complete test :: ");
